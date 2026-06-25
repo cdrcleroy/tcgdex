@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="cards-page">
+
+    <header class="cards-hero">
+        <p class="cards-kicker">Pokémon cards</p>
+        <h1>Recherche d’images HD</h1>
+        <p>
+            Recherche une carte Pokémon et télécharge son image en haute qualité.
+        </p>
+    </header>
+
+    <section class="search-panel">
+        <form method="post" id="search-form" class="search-form" autocomplete="off">
+            {% csrf_token %}
+
+            <div class="search-field">
+                <label for="{{ form.name.id_for_label }}">Nom de la carte</label>
+                {{ form.name }}
+                <div id="autocomplete-results" class="autocomplete-results"></div>
+            </div>
+
+            <div class="search-actions">
+                <a href="{% url 'cards:cards_search' %}" class="button button-secondary">
+                    Réinitialiser
+                </a>
+
+                <button type="submit" class="button button-primary">
+                    Rechercher
+                </button>
+            </div>
+        </form>
+    </section>
+
+    {% if search %}
+        <div class="results-header">
+            <h2>Résultats pour “{{ search }}”</h2>
+
+            {% if pagination %}
+                <span>Page {{ pagination.page }}</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if cards %}
+        <div class="card-grid">
+            {% for card in cards %}
+                <article class="pokemon-card">
+                    <a
+                        class="card-image-link"
+                        href="{% url 'cards:card_download' %}?url={{ card.image_url|urlencode }}&name={{ card.download_name|urlencode }}"
+                        title="Télécharger {{ card.name }}"
+                    >
+                        <img src="{{ card.image_light }}" alt="{{ card.name }}">
+                    </a>
+
+                    <div class="card-content">
+                        <h3>{{ card.name }}</h3>
+
+                        <a
+                            class="download-link"
+                            href="{% url 'cards:card_download' %}?url={{ card.image_url|urlencode }}&name={{ card.download_name|urlencode }}"
+                        >
+                            Télécharger en HD
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% elif search %}
+        <div class="empty-state">
+            <h2>Aucune carte trouvée</h2>
+            <p>Aucun résultat pour “{{ search }}”. Essaie avec un nom plus court.</p>
+        </div>
+    {% endif %}
+
+    {% if pagination %}
+        <nav class="pagination" aria-label="Pagination">
+            {% if pagination.has_previous %}
+                <a href="?name={{ search|urlencode }}&page={{ pagination.previous_page }}" class="page-link">
+                    ← Précédent
+                </a>
+            {% else %}
+                <span class="page-link disabled">← Précédent</span>
+            {% endif %}
+
+            <span class="page-current">
+                Page {{ pagination.page }}
+            </span>
+
+            {% if pagination.has_next %}
+                <a href="?name={{ search|urlencode }}&page={{ pagination.next_page }}" class="page-link">
+                    Suivant →
+                </a>
+            {% else %}
+                <span class="page-link disabled">Suivant →</span>
+            {% endif %}
+        </nav>
+    {% endif %}
+
+</section>
+{% endblock content %}
+
+{% block extra_js %}
+<script src={% static "js/main.js" %}></script>
+{% endblock extra_js %}

@@ -1,0 +1,21 @@
+{# templates/base.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>
+            PKMNCards
+        </title>
+        <link rel="stylesheet" href="{% static "css/style.css" %}" />
+        {% block extra_css %}
+        {% endblock extra_css %}
+    </head>
+    <body>
+        {% block content %}
+        {% endblock content %}
+    </body>
+    {% block extra_js %}
+    {% endblock extra_js %}
+</html>
